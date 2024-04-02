@@ -6,37 +6,102 @@ class View(ft.UserControl):
         super().__init__()
         # page stuff
         self._page = page
-        self._page.title = "Lab O4 - segreteria studenti"
+        self._page.title = "Lab 05 - segreteria studenti"
         self._page.horizontal_alignment = 'CENTER'
         self._page.theme_mode = ft.ThemeMode.LIGHT
         # controller (it is not initialized. Must be initialized in the main, after the controller is created)
         self._controller = None
         # graphical elements
         self._title = None
-        self.txt_name = None
-        self.btn_hello = None
+        self.dd_corso = None
+        self.txt_corso = None
+        self.btn_cerca_iscritti = None
+        self.txt_matricola = None
+        self.txt_nome = None
+        self.txt_cognome = None
+        self.btn_cerca_studente = None
+        self.btn_cerca_corsi = None
+        self.btn_iscrivi = None
+
         self.txt_result = None
-        self.txt_container = None
 
     def load_interface(self):
         """Function that loads the graphical elements of the view"""
         # title
-        self._title = ft.Text("Hello World", color="blue", size=24)
+        self._title = ft.Text("App Gestione Studenti", color="blue", size=24)
         self._page.controls.append(self._title)
 
-        #ROW with some controls
-        # text field for the name
-        self.txt_name = ft.TextField(
-            label="name",
+        #################################
+        # Row 0
+        #################################
+        # dropdown menu
+        self.dd_corso = ft.Dropdown(
+            label="corso",
             width=200,
-            hint_text="Insert a your name"
+            hint_text="Selezionare un corso",
+            options=[],
+            autofocus=True,
+            on_change=self._controller.visualizza_nome_corso
+        )
+        ##populate dropdown
+        self._controller.populate_dd_corso()
+        self.txt_corso = ft.TextField(
+            label="nome corso",
+            width=400,
+            read_only=True
         )
 
-        # button for the "hello" reply
-        self.btn_hello = ft.ElevatedButton(text="Hello", on_click=self._controller.handle_hello)
-        row1 = ft.Row([self.txt_name, self.btn_hello],
+        # button cerca_iscritti
+        self.btn_cerca_iscritti = ft.ElevatedButton(text="Cerca Iscritti",
+                                                    on_click=self._controller.cerca_iscritti,
+                                                    tooltip="cerca gli iscritti al corso selezionato"                                                    )
+
+        row0 = ft.Row([self.dd_corso, self.txt_corso, self.btn_cerca_iscritti],
+                      alignment=ft.MainAxisAlignment.CENTER)
+        self._page.controls.append(row0)
+
+        ########################################
+        # ROW with some text fields
+        #######################################
+        # text field per la matricola
+        self.txt_matricola = ft.TextField(
+            label="matricola",
+            width=150,
+            hint_text="Inserire matricola"
+        )
+        # text field per il nome
+        self.txt_nome = ft.TextField(
+            label="nome",
+            width=250,
+            read_only=True
+        )
+        # text field per il cognome
+        self.txt_cognome = ft.TextField(
+            label="cognome",
+            width=250,
+            read_only=True
+        )
+
+        row1 = ft.Row([self.txt_matricola, self.txt_nome, self.txt_cognome],
                       alignment=ft.MainAxisAlignment.CENTER)
         self._page.controls.append(row1)
+
+        #######################################
+        # ROW with some buttons
+        #######################################
+        self.btn_cerca_studente = ft.ElevatedButton(text="Cerca studente",
+                                                    on_click=self._controller.cerca_studente,
+                                                    tooltip="Verifica se c'è uno studente con la matricola specificata")
+        self.btn_cerca_corsi = ft.ElevatedButton(text="Cerca corsi",
+                                                 on_click=self._controller.cerca_corsi,
+                                                 tooltip="cerca i corsi a cui è iscritto lo studente con la matricola specificata")
+        self.btn_iscrivi = ft.ElevatedButton(text="Iscrivi",
+                                             on_click=self._controller.iscrivi,
+                                             tooltip="iscritto al corso selezionato lo studente con la matricola specificata")
+
+        row2 = ft.Row([self.btn_cerca_studente, self.btn_cerca_corsi, self.btn_iscrivi],
+                      alignment=ft.MainAxisAlignment.CENTER)
+        self._page.controls.append(row2)
 
         # List View where the reply is printed
         self.txt_result = ft.ListView(expand=1, spacing=10, padding=20, auto_scroll=True)
@@ -64,3 +129,5 @@ class View(ft.UserControl):
 
     def update_page(self):
         self._page.update()
+
+
