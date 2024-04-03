@@ -14,7 +14,6 @@ class View(ft.UserControl):
         # graphical elements
         self._title = None
         self.dd_corso = None
-        self.txt_corso = None
         self.btn_cerca_iscritti = None
         self.txt_matricola = None
         self.txt_nome = None
@@ -22,7 +21,6 @@ class View(ft.UserControl):
         self.btn_cerca_studente = None
         self.btn_cerca_corsi = None
         self.btn_iscrivi = None
-
         self.txt_result = None
 
     def load_interface(self):
@@ -37,26 +35,21 @@ class View(ft.UserControl):
         # dropdown menu
         self.dd_corso = ft.Dropdown(
             label="corso",
-            width=200,
+            width=550,
             hint_text="Selezionare un corso",
             options=[],
             autofocus=True,
-            on_change=self._controller.visualizza_nome_corso
+            on_change=self._controller.leggi_corso
         )
         ##populate dropdown
         self._controller.populate_dd_corso()
-        self.txt_corso = ft.TextField(
-            label="nome corso",
-            width=400,
-            read_only=True
-        )
 
         # button cerca_iscritti
         self.btn_cerca_iscritti = ft.ElevatedButton(text="Cerca Iscritti",
                                                     on_click=self._controller.cerca_iscritti,
                                                     tooltip="cerca gli iscritti al corso selezionato"                                                    )
 
-        row0 = ft.Row([self.dd_corso, self.txt_corso, self.btn_cerca_iscritti],
+        row0 = ft.Row([self.dd_corso, self.btn_cerca_iscritti],
                       alignment=ft.MainAxisAlignment.CENTER)
         self._page.controls.append(row0)
 

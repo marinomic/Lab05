@@ -8,11 +8,9 @@ class Model:
     def get_corsi(self):
         return corso_DAO.get_corsi()
 
-    def get_iscritti_corso(self, codice_corso):
-        return corso_DAO.get_iscritti_corso(codice_corso)
+    def get_iscritti_corso(self, corso):
+        return corso_DAO.get_iscritti_corso(corso)
 
-    def get_corso(self, codin):
-        return corso_DAO.get_corso(codin)
 
     def cerca_studente(self, matricola):
         return studente_DAO.cerca_studente(matricola)

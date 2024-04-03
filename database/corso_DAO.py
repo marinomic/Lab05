@@ -21,28 +21,9 @@ def get_corsi() -> list[Corso]:
         return result
     else:
         print("Could not connect")
-        return result
+        return None
 
-def get_corso(codin) -> Corso:
-    """
-    Funzione che legge tutti i corsi nel database
-    :return: una lista con tutti i corsi presenti
-    """
-    cnx = get_connection()
-    result = None
-    if cnx is not None:
-        cursor = cnx.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM corso WHERE codins = %s", (codin,))
-        for row in cursor:
-            result = Corso(row["codins"], row["crediti"], row["nome"], row["pd"])
-        cursor.close()
-        cnx.close()
-        return result
-    else:
-        print("Could not connect")
-        return result
-
-def get_iscritti_corso(codin) -> list[Studente]:
+def get_iscritti_corso(codins) -> list[Studente]:
     """
     Funzione che recupera una lista con tutti gl istudenti iscritti al corso selezionato
     :param corso: il corso di cui recuperare gli iscritti
@@ -57,7 +38,7 @@ def get_iscritti_corso(codin) -> list[Studente]:
     if cnx is not None:
         cursor = cnx.cursor(dictionary=True)
 
-        cursor.execute(query, (codin,))
+        cursor.execute(query, (codins,))
         for row in cursor:
             result.append(Studente(row["matricola"], row["cognome"], row["nome"], row["CDS"]))
         cursor.close()
@@ -65,7 +46,7 @@ def get_iscritti_corso(codin) -> list[Studente]:
         return result
     else:
         print("Could not connect")
-        return result
+        return None
 
 def get_corsi_studente(matricola) -> list[Corso]:
     """

@@ -1,6 +1,7 @@
 import flet as ft
 from UI.view import View
 from model.model import Model
+from model.corso import Corso
 
 class Controller:
     def __init__(self, view: View, model: Model):
@@ -8,21 +9,26 @@ class Controller:
         self._view = view
         # the model, which implements the logic of the program and holds the data
         self._model = model
+        # self dizionario corsi
+        self._id_map_corsi = {}
+        # il corso selezionato nel menu a tendina
+        self.corso_selezionato = None
 
     def cerca_iscritti(self,e):
-        codice_corso = self._view.dd_corso.value
-        if codice_corso is None:
+        if self.corso_selezionato is None:
             self._view.create_alert("Selezionare un corso!")
             return
-        iscritti = self._model.get_iscritti_corso(codice_corso)
+        iscritti = self._model.get_iscritti_corso(self.corso_selezionato)
+        if iscritti is None:
+            self._view.create_alert("Problema nella connessione!")
+            return
+        self._view.txt_result.controls.clear()
         if len(iscritti) == 0:
-            self._view.txt_result.controls.clear()
             self._view.txt_result.controls.append(ft.Text("Non ci sono iscritti al corso"))
         else:
-            self._view.txt_result.controls.clear()
             self._view.txt_result.controls.append(ft.Text(f"Ci sono {len(iscritti)} iscritti al corso:"))
-            for iscritto in iscritti:
-                self._view.txt_result.controls.append(ft.Text(f"{iscritto}"))
+            for studente in iscritti:
+                self._view.txt_result.controls.append(ft.Text(f"{studente}"))
             self._view.update_page()
 
 
@@ -81,13 +87,11 @@ class Controller:
 
     def populate_dd_corso(self):
         for corso in self._model.get_corsi():
-            self._view.dd_corso.options.append(ft.dropdown.Option(corso.codins))
+            self._id_map_corsi[corso.codins] = corso
+            self._view.dd_corso.options.append(ft.dropdown.Option(key=corso.codins, text=corso))
         self._view.update_page()
 
-    def visualizza_nome_corso(self, e):
-        codice_corso = self._view.dd_corso.value
-        corso = self._model.get_corso(codice_corso)
-        if corso is not None:
-            self._view.txt_corso.value = f"{corso.nome}"
-            self._view.update_page()
+    def leggi_corso(self, e):
+        self.corso_selezionato = self._view.dd_corso.value
+
 
