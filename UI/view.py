@@ -47,7 +47,7 @@ class View(ft.UserControl):
         # button cerca_iscritti
         self.btn_cerca_iscritti = ft.ElevatedButton(text="Cerca Iscritti",
                                                     on_click=self._controller.cerca_iscritti,
-                                                    tooltip="cerca gli iscritti al corso selezionato"                                                    )
+                                                    tooltip="cerca gli iscritti al corso selezionato")
 
         row0 = ft.Row([self.dd_corso, self.btn_cerca_iscritti],
                       alignment=ft.MainAxisAlignment.CENTER)
@@ -100,14 +100,6 @@ class View(ft.UserControl):
         self.txt_result = ft.ListView(expand=1, spacing=10, padding=20, auto_scroll=True)
         self._page.controls.append(self.txt_result)
         self._page.update()
-
-    @property
-    def controller(self):
-        return self._controller
-
-    @controller.setter
-    def controller(self, controller):
-        self._controller = controller
 
     def set_controller(self, controller):
         self._controller = controller

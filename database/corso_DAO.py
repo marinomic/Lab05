@@ -1,10 +1,9 @@
-# Add whatever it is needed to interface with the DB Table corso
-
 from database.DB_connect import get_connection
 from model.corso import Corso
 from model.studente import Studente
 
-def get_corsi() -> list[Corso]:
+
+def get_corsi() -> list[Corso] | None:
     """
     Funzione che legge tutti i corsi nel database
     :return: una lista con tutti i corsi presenti
@@ -23,7 +22,8 @@ def get_corsi() -> list[Corso]:
         print("Could not connect")
         return None
 
-def get_iscritti_corso(codins) -> list[Studente]:
+
+def get_iscritti_corso(codins) -> list[Studente] | None:
     """
     Funzione che recupera una lista con tutti gl istudenti iscritti al corso selezionato
     :param corso: il corso di cui recuperare gli iscritti
@@ -47,6 +47,7 @@ def get_iscritti_corso(codins) -> list[Studente]:
     else:
         print("Could not connect")
         return None
+
 
 def get_corsi_studente(matricola) -> list[Corso]:
     """
@@ -72,11 +73,13 @@ def get_corsi_studente(matricola) -> list[Corso]:
         print("Could not connect")
         return result
 
-def iscrivi_corso(matricola, codins):
+
+def iscrivi_corso(matricola, codins) -> bool:
     """
     Funzione che aggiunge uno studente agli iscritti di un corso
     :param matricola: la matricola dello studente
     :param codins: il codice del corso
+    :return: True se l-operazione va a buon fine, False altrimenti
     """
     cnx = get_connection()
     result = []
@@ -86,7 +89,7 @@ def iscrivi_corso(matricola, codins):
     """
     if cnx is not None:
         cursor = cnx.cursor()
-        cursor.execute(query, (matricola,codins,))
+        cursor.execute(query, (matricola, codins,))
         cnx.commit()
         cursor.close()
         cnx.close()
