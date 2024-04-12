@@ -2,10 +2,11 @@ from database.DB_connect import get_connection
 from model.studente import Studente
 
 
-def cerca_studente(matricola) -> Studente | None:
+def cerca_studente(matricola, mappa_studenti):
     """
         Funzione che data una matricola ricerca nel database lo studente corrispondente (se presente)
         :param matricola: la matricola dello studente da ricercare
+        :param mappa_studenti: una mappa di studenti. Le keys sono le matricole, i values sono oggetti Studente
         :return: uno studente, se presente
         """
     cnx = get_connection()
@@ -14,12 +15,8 @@ def cerca_studente(matricola) -> Studente | None:
         cursor.execute("SELECT * FROM studente WHERE matricola = %s", (matricola,))
         row = cursor.fetchone()
         if row is not None:
-            result = Studente(row["matricola"], row["cognome"], row["nome"], row["CDS"])
-        else:
-            result = None
+            mappa_studenti[matricola] = Studente(row["matricola"], row["cognome"], row["nome"], row["CDS"])
         cursor.close()
         cnx.close()
-        return result
     else:
         print("Could not connect")
-        return None

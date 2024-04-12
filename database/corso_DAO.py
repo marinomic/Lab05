@@ -3,24 +3,21 @@ from model.corso import Corso
 from model.studente import Studente
 
 
-def get_corsi() -> list[Corso] | None:
+def fill_mappa_corsi(mappa_corsi):
     """
     Funzione che legge tutti i corsi nel database
-    :return: una lista con tutti i corsi presenti
     """
     cnx = get_connection()
-    result = []
     if cnx is not None:
         cursor = cnx.cursor(dictionary=True)
         cursor.execute("SELECT * FROM corso")
         for row in cursor:
-            result.append(Corso(row["codins"], row["crediti"], row["nome"], row["pd"]))
+            corso = Corso(row["codins"], row["crediti"], row["nome"], row["pd"])
+            mappa_corsi[corso.codins] = corso
         cursor.close()
         cnx.close()
-        return result
     else:
         print("Could not connect")
-        return None
 
 
 def get_iscritti_corso(codins) -> list[Studente] | None:
@@ -49,14 +46,14 @@ def get_iscritti_corso(codins) -> list[Studente] | None:
         return None
 
 
-def get_corsi_studente(matricola) -> list[Corso]:
+def get_corsi_studente(matricola, studente):
     """
             Funzione che data una matricola ricerca nel database i corsi frequentati
             :param matricola: la matricola dello studente da ricercare
+            :param studente: lo studente di cui si cercano i corsi frequentati
             :return: una lista di corsi
             """
     cnx = get_connection()
-    result = []
     query = """ SELECT corso.* 
     FROM corso, iscrizione 
     WHERE iscrizione.codins=corso.codins AND iscrizione.matricola = %s
@@ -65,13 +62,11 @@ def get_corsi_studente(matricola) -> list[Corso]:
         cursor = cnx.cursor(dictionary=True)
         cursor.execute(query, (matricola,))
         for row in cursor:
-            result.append(Corso(row["codins"], row["crediti"], row["nome"], row["pd"]))
+            studente.corsi.add(Corso(row["codins"], row["crediti"], row["nome"], row["pd"]))
         cursor.close()
         cnx.close()
-        return result
     else:
         print("Could not connect")
-        return result
 
 
 def iscrivi_corso(matricola, codins) -> bool:

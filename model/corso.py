@@ -8,6 +8,9 @@ class Corso:
     nome: str = ""
     pd: int = 0
 
+    #relazione
+    studenti: set = None
+
     def __str__(self):
         return f"{self.nome} ({self.codins})"
 

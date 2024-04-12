@@ -8,6 +8,9 @@ class Studente:
     nome: str = ""
     CDS: str = ""
 
+    #relazione
+    corsi: set = None
+
     def __str__(self):
         return f"{self.nome}, {self.cognome} ({self.matricola})"
 

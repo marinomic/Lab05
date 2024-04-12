@@ -10,16 +10,14 @@ class Controller:
         self._view = view
         # the model, which implements the logic of the program and holds the data
         self._model = model
-        # self dizionario corsi
-        self._id_map_corsi = {}
         # il corso selezionato nel menu a tendina
-        self.corso_selezionato = None
+        self.codins_corso_selezionato = None
 
     def cerca_iscritti(self, e):
-        if self.corso_selezionato is None:
+        if self.codins_corso_selezionato is None:
             self._view.create_alert("Selezionare un corso!")
             return
-        iscritti = self._model.get_iscritti_corso(self.corso_selezionato)
+        iscritti = self._model.get_iscritti_corso(self.codins_corso_selezionato)
         if iscritti is None:
             self._view.create_alert("Problema nella connessione!")
             return
@@ -53,7 +51,9 @@ class Controller:
             return
         else:
             corsi = self._model.get_corsi_studente(matricola)
-            if len(corsi) == 0:
+            if corsi is None:
+                self._view.create_alert("Non risulta nessuno studente con la matricola indicata")
+            elif len(corsi) == 0:
                 self._view.create_alert("La matricola indicata non risulta iscritta ad alcun corso")
             else:
                 self._view.txt_result.controls.clear()
@@ -71,11 +71,10 @@ class Controller:
         if studente is None:
             self._view.create_alert("Matricola non presente nel database")
             return
-        codice_corso = self._view.dd_corso.value
-        if codice_corso is None:
+        if self.codins_corso_selezionato is None:
             self._view.create_alert("Selezionare un corso!")
             return
-        result = self._model.iscrivi_corso(matricola, codice_corso)
+        result = self._model.iscrivi_corso(matricola, self.codins_corso_selezionato)
         self._view.txt_result.controls.clear()
         if result:
             self._view.txt_result.controls.append(ft.Text("Iscrizione avvenuta con successo"))
@@ -84,10 +83,9 @@ class Controller:
         self._view.update_page()
 
     def populate_dd_corso(self):
-        for corso in self._model.get_corsi():
-            self._id_map_corsi[corso.codins] = corso
+        for codin, corso in self._model.get_corsi().items():
             self._view.dd_corso.options.append(ft.dropdown.Option(key=corso.codins, text=corso))
         self._view.update_page()
 
     def leggi_corso(self, e):
-        self.corso_selezionato = self._view.dd_corso.value
+        self.codins_corso_selezionato = self._view.dd_corso.value
