@@ -32,9 +32,9 @@ def get_iscritti_corso(codins) -> list[Studente] | None:
     """
     cnx = get_connection()
     result = []
-    query = """SELECT studente.*
-                FROM iscrizione AS i, studente AS s
-                WHERE i.matricola=s.matricola AND i.codins=%s"""
+    query = """SELECT studente.* 
+                FROM iscrizione, studente 
+                WHERE iscrizione.matricola=studente.matricola AND iscrizione.codins=%s"""
     if cnx is not None:
         cursor = cnx.cursor(dictionary=True)
         cursor.execute(query, (codins,))
@@ -44,27 +44,77 @@ def get_iscritti_corso(codins) -> list[Studente] | None:
         cnx.close()
         return result
     else:
-        print("Could not connect")
+        print("Couldn't retrieve connection")
         return None
 
 
-def count_iscritti_corso(codins) -> int | None:
+# def get_corsi_studente(matricola, studente):
+#     """
+#     Funzione che data una matricola ricerca nel database i corsi frequentati
+#     :param studente:
+#     :param matricola: la matricola dello studente da ricercare
+#     :return: una lista di corsi
+#     """
+#     cnx = get_connection()
+#     query = """
+#             SELECT corso.*
+#             FROM corso,iscrizione
+#             WHERE iscrizione.codins=corso.codins
+#             AND iscrizione.matricola=%s
+#             """
+#     if cnx is not None:
+#         cursor = cnx.cursor(dictionary=True)
+#         cursor.execute(query, (matricola,))
+#         for row in cursor:
+#             studente.corsi.add(Corso(row["codins"], row["crediti"], row["nome"], row["pd"]))
+#             cursor.close()
+#             cnx.close()
+#     else:
+#         print("Could not connect")
+
+def get_corsi_studente(matricola, studente):
     """
-    Una funzione che recupera una lista di tutti gli studenti iscritti al corso selezionato
-    :param codins: il corso di cui recuperare gli iscritti
-    :return: una lista di tutti gli studenti iscritti
-    """
+            Funzione che data una matricola ricerca nel database i corsi frequentati
+            :param matricola: la matricola dello studente da ricercare
+            :param studente: lo studente di cui si cercano i corsi frequentati
+            :return: una lista di corsi
+            """
     cnx = get_connection()
-    counter = 0
-    query = """SELECT COUNT(studente.*)
-                FROM iscrizione AS i, studente AS s
-                WHERE i.matricola=s.matricola AND i.codins=%s"""
+    query = """ SELECT corso.*
+    FROM corso, iscrizione
+    WHERE iscrizione.codins=corso.codins AND iscrizione.matricola = %s
+    """
     if cnx is not None:
         cursor = cnx.cursor(dictionary=True)
-        counter = cursor.execute(query, (codins,))
+        cursor.execute(query, (matricola,))
+        for row in cursor:
+            studente.corsi.add(Corso(row["codins"], row["crediti"], row["nome"], row["pd"]))
         cursor.close()
         cnx.close()
-        return counter
     else:
         print("Could not connect")
-        return None
+
+
+def iscrivi_corso(matricola, codins) -> bool:
+    """
+        Funzione che aggiunge uno studente agli iscritti di un corso
+        :param matricola: la matricola dello studente
+        :param codins: il codice del corso
+        :return: True se l-operazione va a buon fine, False altrimenti
+        """
+    cnx = get_connection()
+    result = []
+    query = """INSERT IGNORE INTO `iscritticorsi`.`iscrizione` 
+                (`matricola`, `codins`) 
+                VALUES(%s,%s)
+            """
+    if cnx is not None:
+        cursor = cnx.cursor()
+        cursor.execute(query, (matricola, codins,))
+        cnx.commit()
+        cursor.close()
+        cnx.close()
+        return True
+    else:
+        print("Could not connect")
+        return False
